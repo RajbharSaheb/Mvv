@@ -1,14 +1,14 @@
-# Use lightweight Python base image
 FROM python:3.10-slim
 
-# Set work directory
-WORKDIR /app
+# Install Chrome and ChromeDriver
+RUN apt-get update && apt-get install -y wget unzip chromium chromium-driver
 
-# Copy project files
+WORKDIR /app
 COPY . /app
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Run the bot
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
+
 CMD ["python", "bot_with_scraper.py"]
