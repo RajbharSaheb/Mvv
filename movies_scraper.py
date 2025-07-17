@@ -25,14 +25,25 @@ def scrape_download_links(page_url):
     r = requests.get(page_url, headers=HEADERS)
     if r.status_code != 200:
         return []
+
     soup = BeautifulSoup(r.text, 'html.parser')
     links = []
-    for a in soup.find_all("a", href=True):
-        href = a["href"]
+
+    # Look into paragraphs and buttons too
+    for a in soup.find_all(['a', 'button'], href=True):
+        href = a['href']
         text = a.text.strip()
         if any(x in href.lower() for x in ["drive", "mega", "mediafire", "zippy", "clicknupload", "1fichier"]):
-            links.append(f"🔗 {text}: {href}")
+            links.append(f"🔗 {text or href}: {href}")
+
+    # Fallback: try all external links on page
+    if not links:
+        for a in soup.find_all("a", href=True):
+            if "http" in a["href"] and BASE_URL not in a["href"]:
+                links.append(f"🔗 {a.text.strip() or 'Link'}: {a['href']}")
+
     return links or ["⚠️ No download links found."]
+
 
 def scrape_latest_movies():
     r = requests.get(BASE_URL, headers=HEADERS)
