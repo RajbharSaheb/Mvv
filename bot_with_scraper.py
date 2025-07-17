@@ -24,14 +24,16 @@ logger = logging.getLogger(__name__)
 def search_movies(query):
     url = f"{BASE_URL}/?s={query.replace(' ', '+')}"
     r = requests.get(url, headers=HEADERS)
+    print("[DEBUG HTML] ", r.text[:800])
     soup = BeautifulSoup(r.text, 'html.parser')
     results = []
-    for post in soup.select("div#content article")[:5]:
-        title = post.select_one("h2 a").text.strip()
-        link = post.select_one("h2 a")['href']
-        results.append({"title": title, "link": link})
+    for item in soup.select("article, div.post, div.entry")[:5]:
+        a = item.select_one("a")
+        if a:
+            results.append({"title": a.text.strip(), "link": a["href"]})
+    print("[DEBUG Results]", results)
     return results
-
+    
 def get_download_link(movie_url):
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
