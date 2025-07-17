@@ -94,7 +94,7 @@ def main():
 
 if __name__ == '__main__':
     main()
- telegram import Update
+from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 from dotenv import load_dotenv
 
